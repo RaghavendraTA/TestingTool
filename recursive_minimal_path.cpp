@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <climits>
 using namespace std;
 
 typedef long long lld;
@@ -21,7 +22,7 @@ class Graph {
     lld n, m, totalPaths;
 
     Graph(lld num) {
-        n = num, m = 10000, totalPaths = 0;
+        n = num, m = INT_MAX, totalPaths = 0;
         adjacent = new vector<Pair>*[n];
         for(lld i = 0; i < n; i++)
             adjacent[i] = new vector<Pair>;
