@@ -7,11 +7,9 @@ typedef long long lld;
 
 class Pair {
   public:
-    lld first;
-    lld second;
+    lld first, second;
     Pair(lld f, lld s) {
-        first = f;
-        second = s;
+        first = f, second = s;
     }
 };
 
@@ -38,9 +36,8 @@ class Graph {
             this->m = (cost < m) ? cost : m;
             totalPaths++;
         }
-        for(auto j = adjacent[node]->begin(); j != adjacent[node]->end(); ++j) {
+        for(auto j = adjacent[node]->begin(); j != adjacent[node]->end(); ++j)
             dijkstra(j->first, end, cost + j->second);
-        }
     }
     
 };
