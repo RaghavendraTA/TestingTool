@@ -18,10 +18,10 @@ class Graph {
   public:
 
     vector<Pair> **adjacent;
-    lld n, m;
+    lld n, m, totalPaths;
 
     Graph(lld num) {
-        n = num, m = 10000;
+        n = num, m = 10000, totalPaths = 0;
         adjacent = new vector<Pair>*[n];
         for(lld i = 0; i < n; i++)
             adjacent[i] = new vector<Pair>;
@@ -33,8 +33,10 @@ class Graph {
     }
 
     void dijkstra(lld node, lld end, lld cost) {
-        if(node == end)
+        if(node == end) {
             this->m = (cost < m) ? cost : m;
+            totalPaths++;
+        }
         for(auto j = adjacent[node]->begin(); j != adjacent[node]->end(); ++j) {
             dijkstra(j->first, end, cost + j->second);
         }
@@ -59,8 +61,8 @@ int main() {
     g.addline(3, 6, 50);
     g.addline(6, 8, 30);
     g.addline(6, 7, 100);
-    g.addline(7, 8, 100);
+    g.addline(7, 8, 1);
 
     g.dijkstra(0, 8, 0);
-    cout << g.m << endl;
+    cout << g.m << " is the lowest cost & " << g.totalPaths << " different paths are available"<< endl;
 }
