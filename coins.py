@@ -1,8 +1,6 @@
-import sys
 
 def coin_change(x, coins, S):
-    ck = coins[0]
-    coins.pop(0)
+    ck = coins.pop(0)
     while x >= ck:
         x -= ck
         S.append(ck)
@@ -12,6 +10,6 @@ def coin_change(x, coins, S):
     if x == 0:
         print(S)
 
-C = [10, 5, 2]
+C = [10, 2, 5]
 C.sort(reverse=True)
-coin_change(20, C, [])
+coin_change(9, C, [])
