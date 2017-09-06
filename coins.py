@@ -32,6 +32,8 @@ def coin_change(x, coins):
     coins.sort(reverse=True)
     r = [0] * (x + 1)
     change(x, coins, [])
+    if len(r) == (x + 1):
+        return []
     return sorted(r)
 
 C = list(map(int, input().strip().split()))
