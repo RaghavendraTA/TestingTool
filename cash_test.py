@@ -15,8 +15,8 @@ class coins_test(unittest.TestCase):
     def test_output_206(self):
         self.assertEqual(cash.coin_change(206, [10, 103, 200]), [103, 103])
     
-    #def test_output_empty(self):
-        #self.assertEqual(cash.coin_change(20, [6]), [])
+    def test_output_empty(self):
+        self.assertEqual(cash.coin_change(20, [6]), [])
 
 if __name__ == '__main__':
     unittest.main()
