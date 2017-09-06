@@ -1,7 +1,7 @@
 
 flag = True
 
-def coin_change(x, coins, S):
+def coin_change_old(x, coins, S):
     global flag
     ck = coins.pop(0)
     while x >= ck:
@@ -12,20 +12,28 @@ def coin_change(x, coins, S):
     if x == 0 and flag:
         flag = False
         print(S)
+"""New algo"""
+r = []
 
-def greedy_coin_change(x, coins):
-    S = []
-    while x > 0 and len(coins) > 0:
-        ck = coins.pop(0)
-        while x >= ck:
-            x -= ck
-            S.append(ck)
-    if x == 0: print(S)
-    else: print("No solution")
+def change(x, coins, S):
+    global r
+    if x == 0 and len(S) < len(r): 
+        r = S
+        return
+    for i in range(len(coins)):
+        rem = x % coins[i]
+        t = [coins[i]] * ((x - rem) // coins[i])
+        temp = coins.copy()
+        temp.pop(i)
+        change(rem, temp, t + S)
 
-#C = list(map(int, input().strip().split()))
+def coin_change(x, coins):
+    global r
+    coins.sort(reverse=True)
+    r = [0] * (x + 1)
+    change(x, coins, [])
+    return sorted(r)
+
+C = list(map(int, input().strip().split()))
 n = int(input())
-C = [2, 5, 13, 100]
-C.sort(reverse=True)
-coin_change(n, C, [])
-#greedy_coin_change(n, C)
+print(coin_change(n, C))
