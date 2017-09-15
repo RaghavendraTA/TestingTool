@@ -24,9 +24,10 @@ int minCoins(int coins[], int m, int V)
 
 int main()
 {
-    int coins[] =  {10, 5, 2};
-    int m = 3, V = 16;
+    lld coins[] =  {3, 2, 8};
+    lld m = 3, V = 12;
     cout << "Minimum coins required is "
-         << minCoins(coins, m, V);
+         << minCoins(coins, m, V) << endl;
     return 0;
 }
+
