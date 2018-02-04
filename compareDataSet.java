@@ -2,30 +2,27 @@ import java.util.*;
 
 public void compareDataSet(Vector<Vector<String>> leftData, Vector<Vector<String>> rightData, Long ExcelCounter)
 {
-    Collections.sort(leftData, new Comparator() {
-        @Override
-        public Boolean compare(Vector<String> A, Vector<String> B)
-        {
-            return A.get(7).compareTo(B.get(7))
-        }
-    });
+    Map<String, Vector<String>> leftMap = new HashMap<>();
+    Map<String, Vector<String>> rightMap = new HashMap<>();
 
-    Collections.sort(rightData, new Comparator() {
-        @Override
-        public Boolean compare(Vector<String> A, Vector<String> B)
-        {
-            return A.get(7).compareTo(B.get(7))
-        }
-    });
+    for(Vector<String> v: leftData) {
+        leftMap.put(v.get(7), v);
+    }
+
+    for(Vector<String> v: rightData) {
+        rightMap.put(v.get(7), v);
+    }
+
+    Set<String> keys = new TreeSet<>(leftData.keySet());
+    keys.retainAll(rightData.keySet());
 
     Vector<Integer> cells = new Vector<>();
 
-    int index = 0, end = leftData.size() < rightData.size() ? leftData.size() : rightData.size();
-    for (; index < end; index++) {
+    for(String key: keys) {
 
         int j = 3;
-        Iterator<String> lefti = leftData.get(index).iterator();
-        Iterator<String> righti = leftData.get(index).iterator();
+        Iterator<String> lefti = leftMap.get(key).iterator();
+        Iterator<String> righti = rightMap.get(key).iterator();
 
         while (lefti.hasNext() && righti.hasNext()) {
             String ls = lefti.next();
@@ -52,22 +49,22 @@ public void compareDataSet(Vector<Vector<String>> leftData, Vector<Vector<String
 
         if (cells.size() > 0) {
             if (additional_info == 0 || additional_info == 2) {
-                exg.push(leftData.get(index), ExcelCounter);
+                exg.push(leftMap.get(key), ExcelCounter);
                 exg.color(ExcelCounter, cells);
                 ExcelCounter++;
             }
             if (additional_info == 1 || additional_info == 2) {
-                exg.push(rightData.get(index), ExcelCounter);
+                exg.push(rightMap.get(key), ExcelCounter);
                 exg.color(ExcelCounter, cells);
                 ExcelCounter++;
             }
         } else if (discrepancy == 1) {
             if (additional_info == 0 || additional_info == 2) {
-                exg.push(leftData.get(index), ExcelCounter);
+                exg.push(leftMap.get(key), ExcelCounter);
                 ExcelCounter++;
             }
             if (additional_info == 1 || additional_info == 2) {
-                exg.push(rightData.get(index), ExcelCounter);
+                exg.push(rightMap.get(key), ExcelCounter);
                 ExcelCounter++;
             }
         }
@@ -75,32 +72,33 @@ public void compareDataSet(Vector<Vector<String>> leftData, Vector<Vector<String
         cells.clear();
     }
 
-    // What if additional rows still exist ?
-    int leftEnd = end, rightEnd = end;
+    leftMap.removeAll(keys);
+    rightMap.removeAll(keys);
 
-    while (leftEnd < leftData.size() && (additional_info == 0 || additional_info == 2)) {
-        for (int j = 0; j < leftData.get(leftEnd).size(); j++) {
-            cells.add(j + 3);
+    if(additional_info == 0 || additional_info == 2) {
+        for(String key: leftMap.keySet()) {
+            for (int j = 0; j < leftMap.get(key).size(); j++) {
+                cells.add(j + 3);
+            }
+            exg.push(leftMap.get(key), ExcelCounter);
+            exg.color(ExcelCounter, cells);
+            ExcelCounter++;
+
+            cells.clear();
         }
-        exg.push(leftData.get(leftEnd), ExcelCounter);
-        exg.color(ExcelCounter, cells);
-        ExcelCounter++;
-
-        cells.clear();
-        leftEnd++;
     }
 
-    while (rightEnd < rightData.size() && (additional_info == 1 || additional_info == 2)) {
-        for (int j = 0; j < rightData.get(rightEnd).size(); j++) {
-            cells.add(j + 3);
-        }
-        exg.push(rightData.get(rightEnd), ExcelCounter);
-        exg.color(ExcelCounter, cells);
-        ExcelCounter++;
+    if(additional_info == 0 || additional_info == 2) {
+        for (String key: rightMap.keys()) {
+            for (int j = 0; j < rightMap.get(key).size(); j++) {
+                cells.add(j + 3);
+            }
+            exg.push(rightMap.get(key), ExcelCounter);
+            exg.color(ExcelCounter, cells);
+            ExcelCounter++;
 
-        cells.clear();
-        rightEnd++;
+            cells.clear();
+        }
     }
 
-    cells.clear();
 }
