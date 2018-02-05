@@ -12,9 +12,6 @@ class ExcelGenerator:
 
 def compareDataSet(leftData, rightData, ExcelCounter):
 
-    leftData.sort(key=operator.itemgetter(1))
-    rightData.sort(key=operator.itemgetter(1))
-
     leftMap = {}
     rightMap = {}
 
@@ -29,13 +26,12 @@ def compareDataSet(leftData, rightData, ExcelCounter):
     additional_info = 2
     exg = ExcelGenerator()
 
-    keys = set(leftMap.keys())
-    keys = keys.intersection(rightMap.keys())
+    keys = set(leftMap.keys()).intersection(rightMap.keys())
 
     for key in keys:
 
-        lefti = list(leftMap[key])
-        righti = list(rightMap[key])
+        lefti = leftMap[key].copy()
+        righti = rightMap[key].copy()
 
         j = 0
 
@@ -61,7 +57,7 @@ def compareDataSet(leftData, rightData, ExcelCounter):
                 exg.push(rightMap[key], ExcelCounter)
                 exg.color(ExcelCounter, cells)
                 ExcelCounter += 1
-        elif False:
+        elif False: # Discrepancy radio button selected (discrepancy_with_fullrecord == 1)
             if additional_info == 0 or additional_info == 2:
                 exg.push(leftMap[key], ExcelCounter)
                 ExcelCounter += 1
@@ -76,7 +72,7 @@ def compareDataSet(leftData, rightData, ExcelCounter):
 
     if additional_info == 0 or additional_info == 2:
         for key in leftMap.keys():
-            cells += [j + 3 for j in range(len(leftMap[key]))]
+            cells += [j for j in range(len(leftMap[key]))]
             exg.push(leftMap[key], ExcelCounter)
             exg.color(ExcelCounter, cells)
             ExcelCounter += 1
@@ -84,7 +80,7 @@ def compareDataSet(leftData, rightData, ExcelCounter):
 
     if additional_info == 1 or additional_info == 2:
         for key in rightMap.keys():
-            cells += [j + 3 for j in range(len(rightMap[key]))]
+            cells += [j for j in range(len(rightMap[key]))]
             exg.push(rightMap[key], ExcelCounter)
             exg.color(ExcelCounter, cells)
             ExcelCounter += 1
@@ -92,7 +88,7 @@ def compareDataSet(leftData, rightData, ExcelCounter):
 
 
 leftData = [
-    ["ABC", 213, 431],
+    ["ABC", 213, 431, 567],
     ["ABC", 132, 435],
     ["ABC", 123, 432],
     ["RAJI", 333, 999]
