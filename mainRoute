@@ -1,0 +1,58 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const redis = require('redis');
+
+var client = redis.createClient();
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(morgan('dev'));
+
+client.on('connect', function () {
+    console.log('Redis connected');
+});
+
+app.use((req, res, next) => {
+
+    const dt = new Date();
+    const dd = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate();
+    const path = req.path;
+    var key = null;
+    const ipList = req.ip.toString().split(':');
+    const d = dd + '=' + ipList[ipList.length - 1];
+
+    if (req.hostname.startsWith('hwapps')) {
+        req.url = '/hwapps' + req.path;
+        key = 'hwapps';
+    } else if (req.hostname.startsWith('hwengine')) {
+        req.url = '/hwengine' + req.path;
+        key = 'hwengine';
+    } else if (req.hostname.startsWith('dbengine')) {
+        req.url = '/dbengine' + req.path;
+        key = 'dbengine';
+    }
+
+    if (path === '/' && key !== null) {
+        client.hexists(key, d, (err, reply) => {
+            if (reply === 1) {
+                client.hincrby(key, d, 1);
+            } else {
+                client.hmset(key, d, 1);
+            }
+        });
+    }
+
+    next();
+});
+
+app.use(express.static(__dirname + '/public'));
+
+app.use('*', (req, res, next) => {
+    client.hgetall('hwengine', function (err, object) {
+        res.send(object);
+    });
+});
+
+app.listen(8080, () => console.log("App listening at 8080"));
