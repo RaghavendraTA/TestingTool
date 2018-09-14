@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Hello World program in Python
 
