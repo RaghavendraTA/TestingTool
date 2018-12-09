@@ -1,0 +1,220 @@
+<html>
+    <head>
+        <style>
+            .toolbar {
+                height: 50px;
+                width: 100%;
+                background-color: lightblue;
+            }
+            body {
+                margin: 0;
+            }
+            input[type=text] {
+                border: 1px solid silver;
+                border-radius: 5px;
+                height: 30px;
+                width: 150px;
+                top: 10px;
+                position: absolute;
+                margin: 0;
+                padding: 5px;
+            }
+            .gridCreate {
+                border: 1px solid silver;
+                border-radius: 5px;
+                height: 30px;
+                width: 100px;
+                top: 10px;
+                position: absolute;
+                margin: 0;
+                padding: 5px;
+                background-color: bisque;
+                cursor: pointer;
+                right: 400px;
+            }
+            .gridCreate:hover {
+                background-color: orange;
+            }
+            .gridWidth {
+                right: 235px;
+            }
+            .gridHeight {
+                right: 70px;
+            }
+            table tr td {
+                border: 1px solid black;
+            }
+            .gridSpace {
+                margin-top: 20px;
+                margin-left: 20px;
+            }
+            .colorButton {
+                width: 40px;
+                height: 40px;
+                border: 1px solid silver;
+                margin-top: 5px;
+                margin-left: 30px;
+            }
+
+            .solve {
+                border: 1px solid silver;
+                border-radius: 5px;
+                height: 30px;
+                width: 100px;
+                background-color: lightgreen;
+                cursor: pointer;
+                position: absolute;
+                top: 10px;
+                left: 180px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="toolbar">
+            <input type="button" style="background-color: black" onclick="selectedColor=false;" class="colorButton">
+            <input type="button" style="background-color: white" onclick="selectedColor=true;" class="colorButton">
+
+            <input type="button" value="Solve" onclick="Solve()" class="solve"/>
+            
+            <input type="button" value="Create" class="gridCreate" onclick="create()"/>
+            <input type="text" placeholder="GridSize" class="gridWidth" id="gridWidth" value="3"/>
+        </div>
+        <div class="gridSpace">
+            <table><tbody id="gridSpace"></tbody></table>
+        </div>
+        <script>
+            var selectedColor = false;
+
+            function create() {
+                var gw = parseInt(document.getElementById('gridWidth').value);
+                var table = document.getElementById('gridSpace');
+                table.innerHTML = "";
+                let nodes = 0;
+                for(var k = 0; k < gw; k++) {
+                    var trow = '<tr>';
+                    for(var i = 0; i < gw; i++) {
+                        trow += `<td><div style="width: 100px; height: 100px; background-color:white" onclick="fillColor(this)" id="` + k + ',' + i + `" name="` + nodes + `"></td>`;
+                        nodes++;
+                    }
+                    table.innerHTML += trow + '</tr>';
+                }
+            }
+
+            document.onload = function(args) {
+                alert("Working");
+            }
+            create();
+
+            function fillColor(item) {
+                if(selectedColor)
+                    item.style.backgroundColor = 'white';
+                else
+                    item.style.backgroundColor = 'black';
+            }
+
+            function analyze() {
+                var gw = parseInt(document.getElementById('gridWidth').value);
+                var matrics = [];
+
+                for(var k = 0; k < gw; k++) {
+                    var temp = []
+                    for(var i = 0; i < gw; i++) {
+                        let obj = document.getElementById(k + ',' + i);
+                        let name = obj.getAttribute("name");
+                        if (obj.style.backgroundColor == 'black') 
+                            temp.push(-1)
+                        else {
+                            temp.push(parseInt(name));
+                            obj.style.backgroundColor = 'white';
+                        }
+                    }
+                    matrics.push(temp);
+                }
+                return matrics;
+            }
+
+            function dijkstra(graph, n) {
+                let start = 0, dest = n - 1;
+                let visited = [], dist = [], pred = [];
+                for(let i = 0; i <= n; i++) {
+                    visited.push(false);
+                    dist.push(9999);
+                    pred.push(-1);
+                }
+
+                dist[start] = 0;
+
+                while (true) {
+                    let u = -1, mn = 9999;
+                    for (let idx = 0; idx < n; idx++) {
+                        if (!visited[idx] && dist[idx] < mn) {
+                            mn = dist[idx];
+                            u = idx;
+                        }
+                    }
+                    if (u == -1) break;
+                    visited[u] = true
+                    for (i of graph[u]) {
+                        if(i == u) continue;
+                        newLen = dist[u] + 1;
+                        if(newLen < dist[i]) {
+                            dist[i] = newLen
+                            pred[i] = u
+                        }
+                    }
+                }
+
+                let temp = pred[dest];
+                while (temp != -1) {
+                    obj = document.getElementsByName(temp + "")[0];
+                    obj.style.backgroundColor = 'green';
+                    obj = document.getElementsByName(dest + "")[0];
+                    obj.style.backgroundColor = 'green';
+                    dest = temp;
+                    temp = pred[dest];
+                }
+            }
+
+            function Solve() {
+                var grid = analyze();
+                var n = parseInt(document.getElementById('gridWidth').value);
+                var visited = [];
+                for(var i = 0; i < n; i++) {
+                    let temp = []
+                    for(var j = 0; j < n; j++) {
+                        temp.push(false);
+                    }
+                    visited.push(temp);
+                }
+
+                var graph = {};
+
+                for(var i = 0; i < n; i++) {
+                    for(var j = 0; j < n; j++) {
+                        if(grid[i][j] == -1) continue;
+                        graph[grid[i][j]] = checkNeighbours(grid, i, j, n, visited);
+                    }
+                }
+                dijkstra(graph, n * n);
+            }
+
+            function checkNeighbours(grid, i, j, n, visited) {
+                let temp = []
+                if(i + 1 < n && j < n && grid[i + 1][j] != -1 && visited[i + 1][j] == false) {
+                    temp.push(grid[i + 1][j]);
+                }
+                if(i - 1 >= 0 && j < n && grid[i - 1][j] != -1 && visited[i - 1][j] == false) {
+                    temp.push(grid[i - 1][j]);
+                }
+                if(i < n && j + 1 < n && grid[i][j + 1] != -1 && visited[i][j + 1] == false) {
+                    temp.push(grid[i][j + 1]);
+                }
+                if(i < n && j - 1 >= 0 && grid[i][j - 1] != -1 && visited[i][j - 1] == false) {
+                    temp.push(grid[i][j - 1]);
+                }
+                return temp;
+            }
+        </script>
+    </body>
+</html>
